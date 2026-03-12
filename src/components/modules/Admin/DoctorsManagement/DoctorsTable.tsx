@@ -4,17 +4,17 @@ import DataTable from "@/components/shared/table/DataTable";
 import { getDoctors } from "@/services/doctor.services";
 import { IDoctor } from "@/types/doctor.types";
 import { useQuery } from "@tanstack/react-query";
-import { ColumnDef } from "@tanstack/react-table";
+import { doctorColumns } from "./doctorsColumns";
 
 
 const DoctorsTable = () => {
 
-    const doctorColumns : ColumnDef<IDoctor>[] = [
-      { accessorKey: "name", header: "Name"},
-    //   { accessorKey: "specialization", header: "Specialization" },
-      { accessorKey: "experience", header: "Experience" },
-    //   { accessorKey: "rating", header: "Rating" },
-    ];
+    // const doctorColumns : ColumnDef<IDoctor>[] = [
+    //   { accessorKey: "name", header: "Name"},
+    // //   { accessorKey: "specialization", header: "Specialization" },
+    //   { accessorKey: "experience", header: "Experience" },
+    // //   { accessorKey: "rating", header: "Rating" },
+    // ];
 
    
 
