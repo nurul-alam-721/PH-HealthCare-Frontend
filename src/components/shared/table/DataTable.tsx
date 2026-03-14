@@ -1,8 +1,18 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ColumnDef, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
+import { PaginationMeta } from "@/types/api.types";
+import { ColumnDef, flexRender, getCoreRowModel, getPaginationRowModel, getSortedRowModel, PaginationState, SortingState, useReactTable } from "@tanstack/react-table";
 import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal } from "lucide-react";
+import DataTableFilters, {
+  DataTableFilterConfig,
+  DataTableFilterValue,
+  DataTableFilterValues,
+} from "./DataTableFilters";
+import DataTablePagination from "./DataTablePagination";
+import DataTableSearch from "./DataTableSearch";
 
 interface DataTableActions<TData> {
     onView ?: (data : TData) => void;
@@ -19,11 +29,28 @@ interface DataTableProps<TData> {
     sorting ?: {
       state : SortingState;
       onSortingChange : (state : SortingState) => void;
-    }
+    };
+    pagination?: {
+      state: PaginationState;
+      onPaginationChange: (state: PaginationState) => void;
+    };
+    search?: {
+      initialValue?: string;
+      placeholder?: string;
+      debounceMs?: number;
+      onDebouncedChange: (value: string) => void;
+    };
+    filters?: {
+      configs: DataTableFilterConfig[];
+      values: DataTableFilterValues;
+      onFilterChange: (filterId: string, value: DataTableFilterValue | undefined) => void;
+      onClearAll?: () => void;
+    };
+    meta?: PaginationMeta;
 }
 
 
-const DataTable = <TData,>({ data = [] as TData[], columns, actions, emptyMessage, isLoading, sorting } : DataTableProps<TData>) => {
+const DataTable = <TData,>({ data = [] as TData[], columns, actions, emptyMessage, isLoading, sorting, pagination, search, filters, meta } : DataTableProps<TData>) => {
 
 
     const tableColumns : ColumnDef<TData>[] = actions ? [...columns,
@@ -77,14 +104,18 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, emptyMessag
         }
     ] : columns;
 
-    const { getHeaderGroups, getRowModel } = useReactTable({
+    const table = useReactTable({
       data,
       columns: tableColumns,
       getCoreRowModel: getCoreRowModel(),
       getSortedRowModel:getSortedRowModel(),
+      getPaginationRowModel: getPaginationRowModel(),
       manualSorting: !!sorting,
+      manualPagination: !!pagination,
+      pageCount: pagination ? Math.max(meta?.totalPages ?? 0, 0) : undefined,
       state : {
-        ...sorting ? { sorting : sorting.state } : {}
+        ...(sorting ? { sorting : sorting.state } : {}),
+        ...(pagination ? { pagination: pagination.state } : {}),
       },
       onSortingChange : sorting ? 
         (updater) => {
@@ -94,7 +125,18 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, emptyMessag
 
           sorting.onSortingChange(nextSortingState);
         }
-      : undefined
+      : undefined,
+      onPaginationChange: pagination
+        ? (updater) => {
+            const currentPaginationState = pagination.state;
+            const nextPaginationState =
+              typeof updater === "function"
+                ? updater(currentPaginationState)
+                : updater;
+
+            pagination.onPaginationChange(nextPaginationState);
+          }
+        : undefined,
     });
     return (
       <div className="relative">
@@ -107,11 +149,36 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, emptyMessag
           </div>
         )}
 
+        {(search || filters) && (
+          <div className="mb-4 flex flex-wrap items-start gap-3">
+            {search && (
+              <DataTableSearch
+                key={search.initialValue ?? ""}
+                initialValue={search.initialValue}
+                placeholder={search.placeholder}
+                debounceMs={search.debounceMs}
+                onDebouncedChange={search.onDebouncedChange}
+                isLoading={isLoading}
+              />
+            )}
+
+            {filters && (
+              <DataTableFilters
+                filters={filters.configs}
+                values={filters.values}
+                onFilterChange={filters.onFilterChange}
+                onClearAll={filters.onClearAll}
+                isLoading={isLoading}
+              />
+            )}
+          </div>
+        )}
+
         {/* // Table */}
         <div className="rounded-lg border">
           <Table>
             <TableHeader>
-              {getHeaderGroups().map((hg) => (
+              {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id}>
                   {hg.headers.map((header) => (
                     <TableHead key={header.id}>
@@ -147,8 +214,8 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, emptyMessag
               ))}
             </TableHeader>
             <TableBody>
-              {getRowModel()?.rows?.length ? (
-                getRowModel().rows.map((row) => (
+              {table.getRowModel()?.rows?.length ? (
+                table.getRowModel().rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -172,6 +239,15 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, emptyMessag
               )}
             </TableBody>
           </Table>
+
+          {pagination && (
+            <DataTablePagination
+              table={table}
+              totalPages={meta?.totalPages}
+              totalRows={meta?.total}
+              isLoading={isLoading}
+            />
+          )}
         </div>
       </div>
     );
