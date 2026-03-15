@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import QueryProviders from "@/providers/QueryProvider";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -28,7 +29,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProviders>{children}</QueryProviders>
+        <QueryProviders>
+          {children}
+          <Toaster position="top-right" richColors />
+        </QueryProviders>
       </body>
     </html>
   );
