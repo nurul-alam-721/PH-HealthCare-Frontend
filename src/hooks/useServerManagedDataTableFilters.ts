@@ -8,6 +8,7 @@ import {
 } from "@/components/shared/table/DataTableFilters";
 import { useCallback, useMemo } from "react";
 import { UpdateParamsFn } from "./useServerManagedDataTable";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
 const DEFAULT_RANGE_OPERATORS: RangeOperator[] = ["gte", "lte"];
 

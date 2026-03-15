@@ -1,7 +1,7 @@
 "use client";
 
 import { PaginationState, SortingState } from "@tanstack/react-table";
-import { usePathname, useRouter } from "next/navigation";
+import { ReadonlyURLSearchParams, usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 
 interface UseServerManagedDataTableParams {

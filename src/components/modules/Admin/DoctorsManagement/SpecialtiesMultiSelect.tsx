@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client"
 
 import { Badge } from "@/components/ui/badge"
@@ -20,8 +21,8 @@ interface SpecialtiesMultiSelectProps {
   onChange: (nextValue: string[]) => void
   onBlur: () => void
   isLoadingSpecialties?: boolean
-  error?: unknown
-  getErrorMessage: (error: unknown) => string
+  error?: any
+  getErrorMessage: (error: any) => string
 }
 
 const SpecialtiesMultiSelect = ({
