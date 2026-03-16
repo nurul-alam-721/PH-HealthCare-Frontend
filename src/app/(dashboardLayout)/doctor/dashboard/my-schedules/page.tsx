@@ -40,7 +40,9 @@ const MySchedulesPage = async ({
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <DoctorSchedulesTable initialQueryString={queryString} />
+      <section className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <DoctorSchedulesTable initialQueryString={queryString} />
+      </section>
     </HydrationBoundary>
   )
 }
