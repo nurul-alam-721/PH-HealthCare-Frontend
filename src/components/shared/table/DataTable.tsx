@@ -60,7 +60,8 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, toolbarActi
       setHasHydrated(true);
     }, []);
 
-    const showLoadingOverlay = Boolean(isLoading) && hasHydrated;
+    const hydratedIsLoading = hasHydrated ? Boolean(isLoading) : false;
+    const showLoadingOverlay = hydratedIsLoading;
 
 
     const tableColumns : ColumnDef<TData>[] = actions ? [...columns,
@@ -169,7 +170,7 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, toolbarActi
                 placeholder={search.placeholder}
                 debounceMs={search.debounceMs}
                 onDebouncedChange={search.onDebouncedChange}
-                isLoading={isLoading}
+                isLoading={hydratedIsLoading}
               />
             )}
 
@@ -179,7 +180,7 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, toolbarActi
                 values={filters.values}
                 onFilterChange={filters.onFilterChange}
                 onClearAll={filters.onClearAll}
-                isLoading={isLoading}
+                isLoading={hydratedIsLoading}
               />
             )}
 
@@ -260,7 +261,7 @@ const DataTable = <TData,>({ data = [] as TData[], columns, actions, toolbarActi
               table={table}
               totalPages={meta?.totalPages}
               totalRows={meta?.total}
-              isLoading={isLoading}
+              isLoading={hydratedIsLoading}
             />
           )}
         </div>
