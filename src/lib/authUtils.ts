@@ -86,7 +86,8 @@ export const isValidRedirectForRole = (redirectPath : string, role : UserRole) =
 
     role = unifySuperAdminAndAdminRole;
 
-    const routeOwner = getRouteOwner(redirectPath);
+    const sanitizedRedirectPath = redirectPath.split("?")[0] || redirectPath;
+    const routeOwner = getRouteOwner(sanitizedRedirectPath);
 
     if(routeOwner === null || routeOwner === "COMMON"){
         return true;

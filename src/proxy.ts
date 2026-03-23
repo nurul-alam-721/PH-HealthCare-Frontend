@@ -21,6 +21,7 @@ async function refreshTokenMiddleware (refreshToken : string) : Promise<boolean>
 export async function proxy (request : NextRequest) {
    try {
        const { pathname } = request.nextUrl; // eg /dashboard, /admin/dashboard, /doctor/dashboard
+    const pathWithQuery = `${pathname}${request.nextUrl.search}`;
        const accessToken = request.cookies.get("accessToken")?.value;
        const refreshToken = request.cookies.get("refreshToken")?.value;
 
@@ -79,8 +80,14 @@ export async function proxy (request : NextRequest) {
        }
 
 
-       // Rule - 1 : User is logged in (has access token) and trying to access auth route -> allow
-       if(isAuth && isValidAccessToken){
+    // Rule - 1 : Logged-in users should not access auth pages,
+    // except pages that may be mandatory due to account state.
+    if(
+     isAuth &&
+     isValidAccessToken &&
+     pathname !== "/verify-email" &&
+     pathname !== "/reset-password"
+    ){
         return NextResponse.redirect(new URL(getDefaultDashboardRoute(userRole as UserRole), request.url));
        }
 
@@ -108,7 +115,7 @@ export async function proxy (request : NextRequest) {
             }
 
             const loginUrl = new URL("/login", request.url);
-            loginUrl.searchParams.set("redirect", pathname);
+            loginUrl.searchParams.set("redirect", pathWithQuery);
             return NextResponse.redirect(loginUrl);
        }
 
@@ -120,7 +127,7 @@ export async function proxy (request : NextRequest) {
        // Rule - 4 User is Not logged in but trying to access protected route -> redirect to login
        if(!accessToken || !isValidAccessToken){
         const loginUrl = new URL("/login", request.url);
-        loginUrl.searchParams.set("redirect", pathname);
+        loginUrl.searchParams.set("redirect", pathWithQuery);
         return NextResponse.redirect(loginUrl);
        }
 

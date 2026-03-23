@@ -1,7 +1,9 @@
 
+import BookAppointmentModal from "@/components/modules/Patient/Appointments/BookAppointmentModal"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { getUserInfo } from "@/services/auth.services"
 import { getDoctorById } from "@/services/doctor.services"
 import { type IDoctorDetails } from "@/types/doctor.types"
 import { format } from "date-fns"
@@ -45,6 +47,7 @@ const ConsultationDoctorByIdPage = async ({
   params: Promise<{ id: string }>
 }) => {
   const { id } = await params
+  const currentUser = await getUserInfo()
 
   let doctorDetails: IDoctorDetails | null = null
   let errorMessage = ""
@@ -144,6 +147,15 @@ const ConsultationDoctorByIdPage = async ({
               <Badge variant="outline">Experience: {doctorDetails.experience ?? 0} yrs</Badge>
               <Badge variant="outline">Fee: ${doctorDetails.appointmentFee?.toFixed(2) ?? "N/A"}</Badge>
               <Badge variant="outline">Rating: {doctorDetails.averageRating?.toFixed(1) ?? "0.0"}</Badge>
+            </div>
+
+            <div className="pt-3">
+              <BookAppointmentModal
+                doctorId={String(doctorDetails.id)}
+                doctorName={doctorDetails.name}
+                isAuthenticated={Boolean(currentUser)}
+                viewerRole={currentUser?.role ?? null}
+              />
             </div>
           </div>
         </div>

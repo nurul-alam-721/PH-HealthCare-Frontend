@@ -1,5 +1,6 @@
 import DoctorsList from "@/components/modules/Consultation/DoctorsList";
 import { getAllSpecialties, getDoctors } from "@/services/doctor.services";
+import { getUserInfo } from "@/services/auth.services";
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 
 const SPECIALTIES_FILTER_KEY = "specialties.specialty.title";
@@ -53,6 +54,7 @@ const ConsultationPage = async ({
   });
 
   const queryString = normalizedQueryParams.toString();
+  const currentUser = await getUserInfo();
 
   const queryClient = new QueryClient();
 
@@ -71,7 +73,11 @@ const ConsultationPage = async ({
   });
  return (
    <HydrationBoundary state={dehydrate(queryClient)}>
-      <DoctorsList initialQueryString={queryString} />
+      <DoctorsList
+        initialQueryString={queryString}
+        isAuthenticated={Boolean(currentUser)}
+        viewerRole={currentUser?.role ?? null}
+      />
    </HydrationBoundary>
  );
 }
