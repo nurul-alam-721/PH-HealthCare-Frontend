@@ -132,7 +132,7 @@ export interface IDoctorAppointmentItem {
 }
 
 export interface IDoctorDetails extends IDoctor {
-    user: IDoctorUserDetails;
+    user: IDoctorUserDetails & { status: UserStatus };
     appointments?: IDoctorAppointmentItem[];
     doctorSchedules?: IDoctorScheduleItem[];
     reviews?: IDoctorReview[];

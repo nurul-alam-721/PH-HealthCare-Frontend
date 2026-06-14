@@ -1,3 +1,4 @@
+import { logoutAction } from "@/app/_actions/auth.actions"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { UserInfo } from "@/types/user.types"
@@ -9,6 +10,10 @@ interface UserDropdownProps{
 }
 
 const UserDropdown = ({ userInfo }: UserDropdownProps) => {
+  const handleLogout = async () => {
+    await logoutAction();
+  };
+
   return (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -56,7 +61,7 @@ const UserDropdown = ({ userInfo }: UserDropdownProps) => {
             <DropdownMenuSeparator/>
 
 
-            <DropdownMenuItem onClick={() => {}} className="cursor-pointer text-red-600">
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
                 <LogOut className="mr-2 h-4 w-4"/>
                 Logout
             </DropdownMenuItem>
